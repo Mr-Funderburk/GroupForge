@@ -1,0 +1,12 @@
+@use "variables" as var;
+
+footer {
+    text-align: center;
+    font-size: 0.7rem;
+    margin-top: 32px;
+    background-color: #fff;
+    color: var.$dark-gray;
+    padding: 12px;
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.2);
+    p { margin: 4px 0; }
+}
