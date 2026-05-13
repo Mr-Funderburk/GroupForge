@@ -3,8 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GroupForge">
+<meta name="description" content="Classroom group creator — build, shuffle, and save student groups offline.">
+<meta author="Stephen Funderburk">
+
 <title>GroupForge — Classroom Group Creator</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico"/>
+<link rel="icon" type="image/png" href="icon-192.png"/>
+<link rel="icon" type="image/png" href="favicon.png"/>
+   
 <style>
   :root {
     --bg: #0f1117;
@@ -29,8 +43,8 @@
     --radius-sm: 8px;
     --shadow: 0 4px 24px rgba(0,0,0,0.4);
     --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
-    --font-display: 'DM Serif Display', serif;
-    --font-body: 'DM Sans', sans-serif;
+    --font-display: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     --girl-color: #ff9eb5;
     --boy-color: #7eb8ff;
     --other-color: #b8a9ff;
@@ -46,7 +60,6 @@
     overflow-x: hidden;
   }
 
-  /* BACKGROUND EFFECT */
   body::before {
     content: '';
     position: fixed;
@@ -59,7 +72,6 @@
     z-index: 0;
   }
 
-  /* HEADER */
   header {
     position: sticky;
     top: 0;
@@ -77,6 +89,7 @@
   .logo {
     font-family: var(--font-display);
     font-size: 22px;
+    font-weight: 600;
     color: var(--accent);
     letter-spacing: -0.5px;
     flex-shrink: 0;
@@ -92,7 +105,6 @@
     flex-wrap: wrap;
   }
 
-  /* LAYOUT */
   .app-layout {
     display: grid;
     grid-template-columns: 260px 1fr;
@@ -101,7 +113,6 @@
     z-index: 1;
   }
 
-  /* SIDEBAR */
   .sidebar {
     background: var(--surface);
     border-right: 1px solid var(--border);
@@ -187,7 +198,6 @@
 
   .class-item:hover .del-btn { opacity: 1; }
 
-  /* MAIN */
   .main {
     display: flex;
     flex-direction: column;
@@ -195,7 +205,6 @@
     min-height: 0;
   }
 
-  /* TABS */
   .tabs {
     display: flex;
     border-bottom: 1px solid var(--border);
@@ -212,7 +221,7 @@
     font-family: var(--font-body);
     font-size: 13px;
     font-weight: 500;
-    padding: 14px 16px;
+    padding: 15px 16px 14px 16px;
     cursor: pointer;
     border-bottom: 2px solid transparent;
     transition: all 0.15s;
@@ -238,7 +247,6 @@
 
   .tab-content.active { display: flex; flex-direction: column; gap: 20px; }
 
-  /* CARDS */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -258,7 +266,6 @@
     gap: 8px;
   }
 
-  /* BUTTONS */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -325,7 +332,6 @@
   .btn-sm { padding: 5px 10px; font-size: 12px; }
   .btn-xs { padding: 3px 8px; font-size: 11px; }
 
-  /* INPUTS */
   input[type="text"], input[type="number"], select, textarea {
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -367,7 +373,6 @@
     gap: 12px;
   }
 
-  /* STUDENT LIST */
   .student-search-bar {
     position: relative;
   }
@@ -449,7 +454,6 @@
 
   .icon-btn:hover { background: var(--surface3); }
 
-  /* GROUPS DISPLAY */
   .groups-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -546,6 +550,18 @@
 
   .group-member-name { flex: 1; }
   .pin-icon { font-size: 10px; color: var(--gold); }
+  .pin-group-btn {
+    opacity: 0;
+    transition: opacity 0.15s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0 3px;
+    line-height: 1;
+  }
+  .pin-group-btn.is-pinned { opacity: 1; }
+  .group-member:hover .pin-group-btn { opacity: 1; }
   .remove-member-btn {
     opacity: 0;
     transition: opacity 0.15s;
@@ -558,7 +574,6 @@
   }
   .group-member:hover .remove-member-btn { opacity: 1; }
 
-  /* EMPTY STATE */
   .empty-state {
     text-align: center;
     padding: 60px 40px;
@@ -569,7 +584,6 @@
   .empty-state h3 { font-family: var(--font-display); font-size: 22px; color: var(--text2); margin-bottom: 8px; }
   .empty-state p { font-size: 14px; line-height: 1.6; }
 
-  /* GENDER PILL */
   .gender-pill {
     display: flex;
     gap: 2px;
@@ -594,7 +608,6 @@
   .gender-opt.active-M { background: rgba(126,184,255,0.2); color: var(--boy-color); }
   .gender-opt.active-O { background: rgba(184,169,255,0.2); color: var(--other-color); }
 
-  /* BADGES */
   .badge {
     display: inline-flex;
     align-items: center;
@@ -610,7 +623,6 @@
   .badge-rose { background: rgba(255,107,138,0.15); color: var(--rose); }
   .badge-gold { background: rgba(245,200,66,0.15); color: var(--gold); }
 
-  /* STATS ROW */
   .stats-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -634,7 +646,6 @@
 
   .stat-label { font-size: 11px; color: var(--text3); margin-top: 4px; }
 
-  /* MODAL */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -674,7 +685,6 @@
 
   .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
 
-  /* TOAST */
   .toast-container {
     position: fixed;
     bottom: 24px;
@@ -704,7 +714,6 @@
   @keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
   @keyframes fadeOut { to { opacity: 0; transform: translateX(30px); } }
 
-  /* DRAG GHOST */
   .drag-ghost {
     position: fixed;
     pointer-events: none;
@@ -718,7 +727,6 @@
     display: none;
   }
 
-  /* COLOR PALETTE */
   .group-colors { display: flex; gap: 6px; flex-wrap: wrap; }
   .color-swatch {
     width: 20px;
@@ -730,7 +738,6 @@
   }
   .color-swatch.active { border-color: #fff; }
 
-  /* HISTORY TAG */
   .history-tag {
     font-size: 10px;
     color: var(--text3);
@@ -739,16 +746,13 @@
     border-radius: 3px;
   }
 
-  /* DIVIDER */
   .divider { height: 1px; background: var(--border); margin: 4px 0; }
 
-  /* SCROLLBAR */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 
-  /* UNDO BANNER */
   .undo-banner {
     position: fixed;
     bottom: 24px;
@@ -770,7 +774,6 @@
 
   .undo-banner.visible { transform: translateX(-50%) translateY(0); }
 
-  /* REASSIGN MODAL STUDENT SELECT */
   .student-select-list {
     display: flex;
     flex-direction: column;
@@ -795,7 +798,6 @@
   .student-select-item:hover { background: var(--surface2); border-color: var(--border); }
   .student-select-item.chosen { background: var(--accent-glow); border-color: var(--accent); }
 
-  /* SORTING OPTION GRID */
   .sort-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -824,7 +826,6 @@
   .sort-option.active { border-color: var(--accent); background: var(--accent-glow); color: var(--accent); }
   .sort-option .sort-icon { font-size: 20px; }
 
-  /* SECTION HEADER */
   .section-header {
     display: flex;
     align-items: center;
@@ -839,7 +840,6 @@
     color: var(--text);
   }
 
-  /* TAG */
   .tag {
     display: inline-flex;
     align-items: center;
@@ -853,14 +853,12 @@
     border: 1px solid var(--border);
   }
 
-  /* INFO TEXT */
   .info-text {
     font-size: 13px;
     color: var(--text3);
     line-height: 1.6;
   }
 
-  /* NO CLASS SELECTED */
   .no-class-state {
     display: flex;
     flex-direction: column;
@@ -879,7 +877,6 @@
     color: var(--text2);
   }
 
-  /* SPINNER */
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner {
     width: 16px;
@@ -891,7 +888,6 @@
     display: inline-block;
   }
 
-  /* HISTORY PANEL */
   .history-row {
     display: flex;
     align-items: center;
@@ -901,7 +897,6 @@
     padding: 4px 0;
   }
 
-  /* RESPONSIVE */
   @media (max-width: 768px) {
     .app-layout {
       grid-template-columns: 1fr;
@@ -919,6 +914,7 @@
     .stats-row { grid-template-columns: repeat(2, 1fr); }
     .tab-content { padding: 16px; }
     .tabs { padding: 0 12px; }
+    .tab { padding: 12px 8px; }
   }
 
   @media (max-width: 480px) {
@@ -928,14 +924,12 @@
     .undo-banner.visible { transform: translateX(0) translateY(0); }
   }
 
-  /* ANIMATION */
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   .fade-in { animation: fadeIn 0.2s ease forwards; }
 
   @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
   .pop-in { animation: popIn 0.15s ease forwards; }
 
-  /* MOBILE MENU TOGGLE */
   .mobile-menu-btn {
     display: none;
     background: none;
@@ -948,17 +942,141 @@
 
   @media (max-width: 768px) { .mobile-menu-btn { display: block; } }
 
-  /* file input hidden */
   .file-input-hidden { display: none; }
 
-  /* PRINT */
+  .mobile-actions-wrap {
+    display: none;
+    position: relative;
+  }
+  .mobile-action-toggle {
+    font-size: 18px;
+    padding: 4px 10px;
+  }
+  .mobile-actions-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    min-width: 160px;
+    z-index: 300;
+    overflow: hidden;
+  }
+  .mobile-actions-dropdown.open { display: block; }
+  .mobile-actions-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 11px 16px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .mobile-actions-dropdown button:last-child { border-bottom: none; }
+  .mobile-actions-dropdown button:hover { background: var(--surface2); }
+
+  @media (max-width: 600px) {
+    .desktop-action { display: none !important; }
+    .mobile-actions-wrap { display: block; }
+    .logo { display: flex; flex-direction: column; }
+    .logo span { margin: -5px 0; }
+  }
+
   @media print {
-    header, .sidebar, .tabs, .tab-content:not(.active) { display: none !important; }
-    .groups-grid { grid-template-columns: repeat(2, 1fr); }
-    .group-card { break-inside: avoid; }
-    .app-layout { grid-template-columns: 1fr; }
-    .main { overflow: visible; }
-    .tab-content { overflow: visible; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { background: #fff !important; color: #000 !important; }
+    header, .sidebar, .tabs, .tab-content:not(#tab-groups),
+    .toast-container, .undo-banner, .drag-ghost,
+    .modal-overlay { display: none !important; }
+    .app-layout { grid-template-columns: 1fr !important; display: block !important; }
+    .main { overflow: visible !important; display: block !important; }
+    #tab-groups { display: block !important; overflow: visible !important; padding: 0 !important; }
+    .section-header { display: none !important; }
+    #groups-empty-state { display: none !important; }
+
+    #tab-groups::before {
+      content: attr(data-classname);
+      display: block;
+      font-size: 22px;
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 4px;
+      font-family: serif;
+    }
+    #tab-groups::after {
+      content: attr(data-printed);
+      display: block;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .groups-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 12px !important;
+    }
+
+    .group-card {
+      background: #fff !important;
+      border: 1.5px solid #aaa !important;
+      border-radius: 8px !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      overflow: visible !important;
+    }
+
+    .group-header {
+      background: #f0f0f0 !important;
+      border-bottom: 1px solid #ccc !important;
+      padding: 8px 10px !important;
+    }
+
+    .group-name-display {
+      color: #000 !important;
+      font-size: 13px !important;
+      font-weight: 700 !important;
+    }
+
+    .group-count { color: #555 !important; background: #e8e8e8 !important; }
+
+    .group-color-dot { border: 1px solid #999 !important; }
+
+    button, .icon-btn, .remove-member-btn, .pin-group-btn,
+    #undo-btn, .btn { display: none !important; }
+
+    .group-members { padding: 8px 10px !important; }
+
+    .group-member {
+      background: #fafafa !important;
+      border: 1px solid #e0e0e0 !important;
+      border-radius: 4px !important;
+      margin-bottom: 4px !important;
+      padding: 5px 8px !important;
+      cursor: default !important;
+      break-inside: avoid !important;
+    }
+
+    .group-member-name { color: #000 !important; font-size: 12px !important; }
+
+    .gender-badge { border: 1px solid #aaa !important; }
+    .gender-F { background: #f9c !important; }
+    .gender-M { background: #9cf !important; }
+    .gender-O { background: #ccc !important; }
+
+    .pinned-member { border-color: #c90 !important; background: #fffbe6 !important; }
+
+    #unassigned-section { display: none !important; }
+
+    .groups-grid { width: 100% !important; }
   }
 </style>
 </head>
@@ -968,9 +1086,20 @@
   <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
   <div class="logo">GroupForge <span>Smart Grouping</span></div>
   <div class="header-actions">
-    <button class="btn btn-ghost btn-sm" onclick="saveToFile()" title="Save all data to JSON file">💾 <span>Save</span></button>
-    <button class="btn btn-ghost btn-sm" onclick="triggerLoadFile()" title="Load a saved JSON file">📂 <span>Load</span></button>
-    <button class="btn btn-ghost btn-sm" onclick="printGroups()" title="Print current groups">🖨️ <span>Print</span></button>
+    <button class="btn btn-ghost btn-sm desktop-action" onclick="saveToFile()" title="Save all data to JSON file">💾 <span>Save</span></button>
+    <button class="btn btn-ghost btn-sm desktop-action" onclick="triggerLoadFile()" title="Load a saved JSON file">📂 <span>Load</span></button>
+    <button class="btn btn-ghost btn-sm desktop-action" onclick="printGroups()" title="Print current groups">🖨️ <span>Print</span></button>
+    <button class="btn btn-mint btn-sm" id="pwa-install-btn" style="display:none;" onclick="installPWA()" title="Install as app">⬇ <span>Install App</span></button>
+    <!-- Mobile actions menu -->
+    <div class="mobile-actions-wrap" id="mobileActionsWrap">
+      <button class="btn btn-ghost btn-sm mobile-action-toggle" onclick="toggleMobileActions()" title="More actions">⋯</button>
+      <div class="mobile-actions-dropdown" id="mobileActionsDropdown">
+        <button onclick="saveToFile(); closeMobileActions()">💾 Save to file</button>
+        <button onclick="triggerLoadFile(); closeMobileActions()">📂 Load file</button>
+        <button onclick="printGroups(); closeMobileActions()">🖨️ Print groups</button>
+        <button id="pwa-install-mobile" style="display:none" onclick="installPWA(); closeMobileActions()">⬇ Install App</button>
+      </div>
+    </div>
     <input type="file" id="load-file-input" class="file-input-hidden" accept=".json" onchange="loadFromFile(event)">
     <input type="file" id="csv-file-input" class="file-input-hidden" accept=".csv" onchange="importCSV(event)">
   </div>
@@ -979,7 +1108,7 @@
 <div class="app-layout">
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <span class="sidebar-title">Classes / Groups</span>
+      <span class="sidebar-title">Classes</span>
       <button class="btn btn-primary btn-sm" onclick="openNewClassModal()">+ New</button>
     </div>
     <div class="class-list" id="class-list"></div>
@@ -1300,7 +1429,7 @@ function init() {
 // ===== CLASS MANAGEMENT =====
 function createClass() {
   const name = document.getElementById('new-class-name').value.trim();
-  if (!name) { toast('Enter a class name', 'warning'); return; }
+  if (!name) { toast('⚠️ Enter a class name', 'warning'); return; }
   const cls = {
     id: uid(),
     name,
@@ -1550,15 +1679,17 @@ function generateGroups() {
   if (method === 'balanced-gender') {
     sorted = balancedGenderSort(unpinned, numGroups, groups);
   } else if (method === 'separate-gender') {
-    sorted = separateGenderSort(unpinned, numGroups, groups);
+    sorted = separateGenderSort(unpinned, numGroups, groups); // may return null (direct assignment)
   } else if (method === 'avoid-repeat') {
     sorted = avoidRepeatSort(unpinned, cls, groups);
   } else {
     sorted = shuffle([...unpinned]);
   }
 
-  // Distribute
-  sorted.forEach((st, i) => { groups[i % numGroups].members.push(st.id); });
+  // Distribute only if not already directly assigned (separate-gender returns null)
+  if (sorted !== null) {
+    sorted.forEach((st, i) => { groups[i % numGroups].members.push(st.id); });
+  }
 
   // Update group names from groupNames map
   groups.forEach(g => { if (cls.groupNames[g.id]) g.name = cls.groupNames[g.id]; });
@@ -1593,10 +1724,25 @@ function balancedGenderSort(students, numGroups, groups) {
 }
 
 function separateGenderSort(students, numGroups, groups) {
+  // Instead of returning a flat sorted array (which gets round-robined),
+  // we directly assign students to groups by gender blocks and return [] 
+  // to signal that distribution already happened.
   const girls = shuffle(students.filter(s => s.gender === 'F'));
   const boys = shuffle(students.filter(s => s.gender === 'M'));
   const others = shuffle(students.filter(s => s.gender !== 'F' && s.gender !== 'M'));
-  return [...boys, ...girls, ...others];
+
+  const boyGroups = Math.max(1, Math.round(numGroups * boys.length / Math.max(1, boys.length + girls.length)));
+  const girlGroups = Math.max(0, numGroups - boyGroups - (others.length > 0 ? 1 : 0));
+
+  // Assign boys to first boyGroups groups
+  boys.forEach((st, i) => { groups[i % Math.max(1, boyGroups)].members.push(st.id); });
+  // Assign girls to next girlGroups groups
+  girls.forEach((st, i) => { groups[boyGroups + (i % Math.max(1, girlGroups))].members.push(st.id); });
+  // Assign others to remaining groups
+  const othersStart = Math.min(boyGroups + girlGroups, numGroups - 1);
+  others.forEach((st, i) => { groups[(othersStart + i) % numGroups].members.push(st.id); });
+
+  return null; // signals direct assignment was done
 }
 
 function avoidRepeatSort(students, cls, groups) {
@@ -1728,9 +1874,8 @@ function renderStudentList() {
       <div class="gender-badge gender-${s.gender}"></div>
       <div class="student-name">${escHtml(s.name)}</div>
       ${groupInfo ? `<span class="tag">${escHtml(groupInfo)}</span>` : ''}
-      ${s.pinned ? '<span title="Pinned">📌</span>' : ''}
+      ${s.pinned ? '<span title="Pinned to group">📌</span>' : ''}
       <div class="student-actions">
-        <button class="icon-btn" onclick="openReassignModal('${s.id}')" title="Reassign / Pin">🔀</button>
         <button class="icon-btn" onclick="removeStudent('${s.id}')" title="Remove">🗑️</button>
       </div>
     </div>`;
@@ -1776,7 +1921,7 @@ function renderGroups() {
             id="gm-item-${s.id}">
             <div class="gender-badge gender-${s.gender}"></div>
             <div class="group-member-name">${escHtml(s.name)}</div>
-            ${s.pinned ? '<span class="pin-icon">📌</span>' : ''}
+            <button class="pin-group-btn ${s.pinned ? 'is-pinned' : ''}" onclick="togglePinInGroup('${s.id}', ${cls.groups.indexOf(g)})" title="${s.pinned ? 'Unpin (click to release)' : 'Pin to this group'}">${s.pinned ? '📌' : '📍'}</button>
             <button class="remove-member-btn" onclick="removeMemberFromGroup('${s.id}','${g.id}')" title="Remove from group">✕</button>
           </div>
         `).join('')}
@@ -2023,6 +2168,24 @@ function reassignRandom() {
   document.getElementById('undo-btn').disabled = false;
 }
 
+function togglePinInGroup(studentId, groupIdx) {
+  const cls = getActiveClass(); if (!cls) return;
+  const st = cls.students.find(s => s.id === studentId); if (!st) return;
+  if (st.pinned && st.pinnedGroup === groupIdx) {
+    st.pinned = false;
+    st.pinnedGroup = undefined;
+    toast(`📍 ${st.name} unpinned`);
+  } else {
+    st.pinned = true;
+    st.pinnedGroup = groupIdx;
+    const g = cls.groups[groupIdx];
+    toast(`📌 ${st.name} pinned to ${g?.name || 'group'}`);
+  }
+  saveState();
+  renderGroups();
+  renderStudentList();
+}
+
 function togglePinStudent() {
   const cls = getActiveClass(); if (!cls) return;
   const st = cls.students.find(s => s.id === reassignStudentId); if (!st) return;
@@ -2118,8 +2281,26 @@ function loadFromFile(e) {
 function printGroups() {
   const cls = getActiveClass(); if (!cls) return;
   if (cls.groups.length === 0) { toast('⚠️ No groups to print', 'warning'); return; }
-  window.print();
+  // Set data attributes used by print CSS ::before / ::after pseudoelements
+  const tab = document.getElementById('tab-groups');
+  tab.dataset.classname = cls.name;
+  tab.dataset.printed = 'Printed ' + new Date().toLocaleDateString(undefined, {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  // Switch to groups tab so it's visible when printing
+  switchTab('groups', document.querySelector('[data-tab=groups]'));
+  setTimeout(() => window.print(), 150);
 }
+
+// ===== MOBILE ACTIONS =====
+function toggleMobileActions() {
+  document.getElementById('mobileActionsDropdown').classList.toggle('open');
+}
+function closeMobileActions() {
+  document.getElementById('mobileActionsDropdown').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('mobileActionsWrap');
+  if (wrap && !wrap.contains(e.target)) closeMobileActions();
+});
 
 // ===== MODALS =====
 function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -2213,6 +2394,39 @@ function toast(msg, type='success') {
   el.innerHTML = `${icon ? `<span>${icon}</span>` : ''}${msg}`;
   document.getElementById('toast-container').appendChild(el);
   setTimeout(() => el.remove(), 3000);
+}
+
+// ===== PWA — Service Worker & Install Prompt =====
+let _pwaInstallEvent = null;
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {
+    // Silently ignore — happens when opened as a plain file://, which is fine.
+    // The app works fully without the SW; the Install button just won't appear.
+  });
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaInstallEvent = e;
+  document.getElementById('pwa-install-btn').style.display = '';
+  document.getElementById('pwa-install-mobile').style.display = '';
+});
+
+window.addEventListener('appinstalled', () => {
+  _pwaInstallEvent = null;
+  document.getElementById('pwa-install-btn').style.display = 'none';
+  document.getElementById('pwa-install-mobile').style.display = 'none';
+  toast('✅ GroupForge installed! Open it anytime from your home screen or app drawer.');
+});
+
+function installPWA() {
+  if (!_pwaInstallEvent) return;
+  _pwaInstallEvent.prompt();
+  _pwaInstallEvent.userChoice.then(choice => {
+    if (choice.outcome === 'accepted') toast('🎉 Installing GroupForge…');
+    _pwaInstallEvent = null;
+  });
 }
 
 // ===== UTILS =====
