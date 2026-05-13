@@ -1812,7 +1812,17 @@ function generateGroups() {
 
   // Distribute only if not already directly assigned (separate-gender returns null)
   if (sorted !== null) {
-    sorted.forEach((st, i) => { groups[i % numGroups].members.push(st.id); });
+    sorted.forEach((st) => { 
+      let bestIndex = 0;
+      let bestSize = groups[0].members.length;
+      for (let i = 1; i < groups.length; i++) {
+        if (groups[i].members.length < bestSize) {
+          bestSize = groups[i].members.length;
+          bestIndex = i;
+        }
+      }
+      groups[bestIndex].members.push(st.id);
+    });
   }
 
   // Update group names from groupNames map
@@ -1861,8 +1871,7 @@ function balancedGenderSort(students, numGroups, groups) {
 
 function separateGenderSort(students, numGroups, groups) {
   // Instead of returning a flat sorted array (which gets round-robined),
-  // we directly assign students to groups by gender blocks and return [] 
-  // to signal that distribution already happened.
+  // we directly assign students to groups by gender blocks, accounting for existing group sizes
   const girls = shuffle(students.filter(s => s.gender === 'F'));
   const boys = shuffle(students.filter(s => s.gender === 'M'));
   const others = shuffle(students.filter(s => s.gender !== 'F' && s.gender !== 'M'));
@@ -1870,13 +1879,30 @@ function separateGenderSort(students, numGroups, groups) {
   const boyGroups = Math.max(1, Math.round(numGroups * boys.length / Math.max(1, boys.length + girls.length)));
   const girlGroups = Math.max(0, numGroups - boyGroups - (others.length > 0 ? 1 : 0));
 
-  // Assign boys to first boyGroups groups
-  boys.forEach((st, i) => { groups[i % Math.max(1, boyGroups)].members.push(st.id); });
-  // Assign girls to next girlGroups groups
-  girls.forEach((st, i) => { groups[boyGroups + (i % Math.max(1, girlGroups))].members.push(st.id); });
-  // Assign others to remaining groups
+  const distributeToGroups = (list, groupIndices) => {
+    list.forEach((st) => {
+      let bestIndex = groupIndices[0];
+      let bestSize = groups[bestIndex].members.length;
+      for (let i = 1; i < groupIndices.length; i++) {
+        const idx = groupIndices[i];
+        if (groups[idx].members.length < bestSize) {
+          bestSize = groups[idx].members.length;
+          bestIndex = idx;
+        }
+      }
+      groups[bestIndex].members.push(st.id);
+    });
+  };
+
+  // Create index ranges for each gender group
+  const boyGroupIndices = Array.from({length: boyGroups}, (_, i) => i);
+  const girlGroupIndices = Array.from({length: girlGroups}, (_, i) => boyGroups + i);
   const othersStart = Math.min(boyGroups + girlGroups, numGroups - 1);
-  others.forEach((st, i) => { groups[(othersStart + i) % numGroups].members.push(st.id); });
+  const othersGroupIndices = Array.from({length: numGroups - othersStart}, (_, i) => othersStart + i);
+
+  distributeToGroups(boys, boyGroupIndices);
+  distributeToGroups(girls, girlGroupIndices);
+  distributeToGroups(others, othersGroupIndices.length > 0 ? othersGroupIndices : Array.from({length: numGroups}, (_, i) => i));
 
   return null; // signals direct assignment was done
 }
