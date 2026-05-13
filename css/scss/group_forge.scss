@@ -1,0 +1,44 @@
+@use "reset";
+@use "variables" as var;
+@use "fields";
+@use "header";
+@use "sidebar";
+@use "main";
+@use "tab_menu";
+
+body {
+    font-family: var.$font-body;
+    background-color: var.$bg;
+    color: var.$text;
+    min-height: 100vh;
+    overflow-x: hidden;
+
+    &::before {
+        content: "";
+        position: fixed;
+        top: -30%;
+        left: -10%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(ellipse, rgba(108, 143, 255, 0.07) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+    }
+}
+
+.app-container {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 60px);
+    position: relative;
+    z-index: 1;
+}
+
+
+// scrollbar
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var.$border2; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var.$text3; }
+
+.divider { height: 1px; background: var.$border; margin: 4px 0; }

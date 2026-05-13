@@ -1,0 +1,101 @@
+@use "variables" as var;
+
+
+//#region buttons
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var.$radius-sm;
+    border: none;
+    font-family: var.$font-body;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: var.$accent;
+    color: #fff;
+
+    &:hover { 
+        background: var.$accent2; 
+        transform: translateY(-1px); 
+        box-shadow: 0 4px 16px rgba(108, 143, 255, 0.3); 
+    }
+}
+
+.btn-secondary {
+    background: var.$surface3;
+    color: var.$text;
+    border: 1px solid var.$border;
+
+    &:hover {
+        background: var.$surface2; 
+        border-color: var.$border2;
+    }
+}
+
+.btn-danger {
+    background: rgba(255, 107, 138, 0.15);
+    color: var.$danger;
+    border: 1px solid rgba(255, 107, 138, 0.3);
+
+    &:hover { background: rgba(255, 107, 138, 0.25); }
+}
+
+.btn-ghost {
+    background: none;
+    color: var.$text2;
+    border: 1px solid var.$border;
+
+    &:hover {
+        background: var.$surface2;
+        color: var.$text;
+    }
+}
+
+.btn-gold {
+    background: rgba(245, 200, 66, 0.15);
+    color: var.$gold;
+    border: 1px solid rgba(245, 200, 66, 0.3);
+
+    &:hover { background: rgba(245, 200, 66, 0.25); }
+}
+
+.btn-mint {
+    background: rgba(66, 229, 196, 0.15);
+    color: var.$mint;
+    border: 1px solid rgba(66, 229, 196, 0.3);
+
+    &:hover { background: rgba(66, 229, 196, 0.25); }
+}
+
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-xs { padding: 3px 8px; font-size: 11px; }
+
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var.$text;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+
+    &:hover, &:focus {
+        outline: 1px solid var.$text;
+        border-radius: 8px;
+    }
+}
+//#endregion
+
+
+//#region inputs
+.file-input-hidden { display: none; }
+
+//#endregion

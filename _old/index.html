@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta author="Stephen Funderburk">
+    <meta description="An online, local-only, group creator.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="img/favicon.png">
+
+    <title>Group Creator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+    <link rel="stylesheet" href="css/group_creator.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <i class="fa-solid fa-border-all"></i>
+                <h1>Group Creator</h1>
+            </div>
+            <input type="checkbox" id="mainNavToggle">
+            <label for="mainNavToggle" id="mainNavToggleButton"><i class="fa-solid fa-ellipsis-vertical"></i></label>
+            <div id="mainNav">
+                <button id="btnLoadGroups"><i class="fa-solid fa-arrow-up-from-bracket"></i> Load</button>
+                <button id="btnSaveGroups"><i class="fa-solid fa-arrow-right-to-bracket"></i> Save</button>
+                <button id="btnToggleTheme"><i class="fa-regular fa-moon"></i><span> Dark Mode</span></button> <!--fa-sun-->
+            </div>
+        </header>
+
+        <div class="view-switch-container">
+            <div class="view-switch">
+                <button id="btnViewStudents" class="active"><i class="fa-solid fa-users"></i> Students <span>(46)</span></button>
+                <button id="btnViewGroups"><i class="fa-solid fa-border-all"></i> Groups <span>(4)</span></button>
+            </div>
+        </div>
+
+        <section id="studentsTab">
+            <div class="box no-bg">
+                <div class="flex-header">
+                    <h2>My Classes</h2>
+                    <button id="btnAddClass"><i class="fa-solid fa-plus"></i> New Class</button>
+                </div>
+
+                <div id="classes">
+                    <a href="#" id="class01" class="class-button">
+                        <p>Class 1 <span>51</span></p>
+
+                        <div class="class-edit-delete-buttons">
+                            <button id="btnEditClass01" class="class-edit-button"><i class="fa-solid fa-pencil"></i></button>
+                            <button id="btnDeleteClass01" class="class-delete-button"><i class="fa-regular fa-trash-can"></i></button>
+                        </div>
+
+                        <div class="editing-class-name">
+                            <input type="text" id="classNameTemp01" class="class-edit-name" placeholder="Class 1">
+                            <button id="btnAcceptClass01" class="class-accept-button"><i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </a>
+
+                    <a href="#" id="class02" class="class-button active">
+                        <p>Class 2 <span>46</span></p>
+
+                        <div class="class-edit-delete-buttons">
+                            <button id="btnEditClass02" class="class-edit-button"><i class="fa-solid fa-pencil"></i></button>
+                            <button id="btnDeleteClass02" class="class-delete-button"><i class="fa-regular fa-trash-can"></i></button>
+                        </div>
+
+                        <div class="editing-class-name">
+                            <input type="text" id="classNameTemp02" class="class-edit-name" placeholder="Class 2">
+                            <button id="btnAcceptClass02" class="class-accept-button"><i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </a>
+
+                    <a href="#" id="class03" class="class-button editing">
+                        <p>Class 3 <span>107</span></p>
+
+                        <div class="class-edit-delete-buttons">
+                            <button id="btnEditClass03" class="class-edit-button"><i class="fa-solid fa-pencil"></i></button>
+                            <button id="btnDeleteClass03" class="class-delete-button"><i class="fa-regular fa-trash-can"></i></button>
+                        </div>
+
+                        <div class="editing-class-name">
+                            <input type="text" id="classNameTemp03" class="class-edit-name" placeholder="Class 3">
+                            <button id="btnAcceptClass03" class="class-accept-button"><i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex-container">
+                <div class="box">
+                    <h2>Add Students</h2>
+                    <p class="light">Add individually, paste a list, or upload a CSV</p>
+
+                    <input type="checkbox" id="addTypeToggle" class="toggle-switch">
+                    <label for="addTypeToggle" style="margin-left: auto;">
+                        <div>Single</div>
+                        <div>Bulk</div>
+                    </label>
+
+                    <div id="addSingle">
+                        <div class="textbox-container">
+                            <span>Name</span>
+                            <input type="text" placeholder="John Doe">
+                        </div>
+
+                        <div class="rbl">
+                            <input type="radio" id="genderMale" name="gender" checked>
+                            <label for="genderMale" class="gender-male">Male</label>
+                            
+                            <input type="radio" id="genderFemale" name="gender">
+                            <label for="genderFemale" class="gender-female">Female</label>
+                            
+                            <input type="radio" id="genderOther" name="gender">
+                            <label for="genderOther" class="gender-other">Other</label>
+                        </div>
+
+                        <button id="addStudent" class="primary-button" disabled><i class="fa-solid fa-user-plus"></i> Add Student</button>
+                    </div>
+
+                    <div id="addBulk">
+                        <p class="light" style="text-align: center;">One student per line. Acceptable formats:</p>
+                        <p class="light" style="text-align: center;"><strong>FirstName, LastName, Gender</strong></p>
+                        <p class="light" style="text-align: center;">or</p>
+                        <p class="light" style="text-align: center;"><strong>Name, Gender</strong></p>
+
+                        <textarea name="bulkAdd" id="bulkAdd" placeholder="John, Doe, Male"></textarea>
+                        
+                        <button id="addStudentList" class="primary-button" disabled><i class="fa-solid fa-users"></i> Add List</button>
+                    </div>
+
+                    <div class="separator"><span>or</span></div>
+
+                    <button id="uploadCsv" class="secondary-button"><i class="fa-solid fa-arrow-up-from-bracket"></i> Upload CSV / Spreadsheet</button>
+                    <p class="light" style="text-align: center;"><strong>Columns:</strong> FirstName, LastName, Gender</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Smart Grouping — 100% local, nothing leaves your device!</p>
+            <p class="copyright">Copyright &copy; 2026 :: Stephen Funderburk</p>
+        </footer>
+    </div>
+</body>
+</html>

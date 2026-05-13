@@ -1,0 +1,174 @@
+@use "variables" as var;
+@use "sass:color";
+
+
+
+#classes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    .class-button {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        background-color: var.$light-gray;
+        padding: 6px 12px;
+        border: 1px solid var.$dark-gray;
+        border-radius: var.$border-radius;
+        color: color.adjust(var.$dark-gray, $lightness: -15%);
+        transition: background-color 0.25s ease-in-out;
+        overflow: hidden;
+
+        p { margin: 0; padding: 0; }
+        span {
+            position: relative;
+            top: -2px;
+            font-size: 0.65rem;
+            margin-left: 12px;
+            background-color: var.$dark-gray;
+            color: var.$light-gray;
+            padding: 3px 8px;
+            border-radius: 12px;
+            box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.8);
+        }
+
+        &:hover, &:focus { background-color: #fff; }
+
+        &.active {
+            background-color: var.$primary-light;
+            color: #fff;
+
+            span { background-color: color.adjust(var.$primary-light, $lightness: -15%); }
+            button { color: #fff; }
+            .class-edit-button:hover { color: #000; }
+            .class-delete-button:hover { color: var.$danger; }
+            .class-accept-button:hover { color: var.$success; }
+            .class-edit-name { color: #fff; }
+        }
+    }
+
+    .class-accept-button,
+    .class-delete-button,
+    .class-edit-button {
+        padding: 6px;
+        border: 1px solid transparent;
+        background-color: transparent;
+    }
+
+    .class-edit-button   { &:hover { color: var.$primary-light; } }
+    .class-delete-button { &:hover { color: var.$danger; } }
+    .class-accept-button { &:hover { color: var.$success; } }
+
+    .class-edit-name {
+        width: 100%;
+        flex: 2;
+        border-radius: calc(var.$border-radius - 6px);
+        background-color: transparent;
+    }
+
+    .editing-class-name { width: 100%; display: none; }
+    .class-edit-delete-buttons {
+        display: flex;
+        flex-direction: row;
+        margin-left: auto;
+        background-color: transparent;
+    }
+
+    .editing {
+        p { display: none; }
+        .editing-class-name { display: flex; }
+        .class-edit-delete-buttons { display: none; }
+    }
+
+    @media (min-width: var.$breakpoint-tablet) {
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        .class-button {
+            width: auto;
+
+            &:not(.editing) {
+                .class-edit-delete-buttons { 
+                    transition: right 0.2s ease-in-out;
+                    width: 1px;
+                    position: relative;
+                    right: -100%; 
+                }
+
+                &:hover, &:focus {
+                    .class-edit-delete-buttons {
+                        width: auto;
+                        position: relative;
+                        right: -5%;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.primary-button {
+    background-color: var.$primary-light;
+    color: #fff;
+    width: 100%;
+    font-size: 1.1rem;
+    justify-content: center;
+    padding: 8px;
+    margin: 24px 0;
+    border: none;
+
+    &:hover, &:focus {
+        background-color: color.adjust(var.$primary-light, $lightness: 15%);
+    }
+
+    i { margin-right: 10px; }
+    &:disabled {
+        background-color: var.$primary-light-disabled;
+        cursor: default;
+    }
+}
+
+.secondary-button {
+    width: 100%;
+    font-size: 1.1rem;
+    justify-content: center;
+    padding: 8px;
+    margin: 24px 0;
+
+    i { margin-right: 10px; }
+    &:disabled {
+        color: var.$light-gray;
+        border-color: var.$light-gray;
+        cursor: default;
+
+        &:hover, &:focus {
+            color: var.$light-gray;
+            border-color: var.$light-gray;
+            background-color: #fff;
+        }
+    }
+}
+
+
+.separator {
+    width: 100%;
+    height: 1px;
+    background-color: var.$dark-gray;
+    position: relative;
+
+    span {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #fff;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: var.$dark-gray;
+        padding: 0 8px;
+        margin-top: -10px;
+    }
+}

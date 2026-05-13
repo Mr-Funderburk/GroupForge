@@ -1,0 +1,115 @@
+@use "variables" as var;
+
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    position: sticky;
+    background-color: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+
+    .logo {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        column-gap: 6px;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        color: var.$primary-light;
+
+        i { margin-top: 2px; }
+        @media (min-width: var.$breakpoint-tablet) { font-size: 1.4rem; }
+    }
+}
+
+#mainNavToggleButton {
+    border: 1px solid #ccc;
+    padding: 8px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s ease-in-out;
+
+    &:hover, &:focus { border-color: #000; }
+
+    @media (min-width: var.$breakpoint-tablet) { display: none; }
+}
+
+#mainNavToggle:checked ~ #mainNav { display: flex; }
+
+#mainNav {
+    display: none;
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    background-color: #fff;
+    border-radius: var.$border-radius;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
+
+    button {
+        padding: 6px 24px;
+        border-radius: calc(var.$border-radius - 6px);
+        border: none;
+        @media (min-width: var.$breakpoint-tablet) {
+            border: 1px solid #ccc;
+        }
+
+        &#btnSaveGroups i { transform: rotate(90deg); }
+    }
+
+    @media (min-width: var.$breakpoint-tablet) {
+        display: flex;
+        box-shadow: none;
+        position: static;
+        background-color: transparent;
+        flex-direction: row;
+        gap: 8px;
+
+        #btnToggleTheme {
+            padding: 6px;
+            span { display: none; }
+        }
+    }
+}
+
+
+.view-switch-container {
+    margin: 32px 0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .view-switch {
+        background-color: var.$light-gray;
+        border-radius: var.$border-radius;
+        padding: 6px 8px;
+        display: flex;
+        flex-direction: row;
+        column-gap: 16px;
+
+        button {
+            color: var.$dark-gray;
+            padding: 6px 8px;
+            border-radius: calc(var.$border-radius - 6px);
+            border: none;
+            cursor: pointer;
+
+            &:hover, &:focus { color: #000; }
+            i { margin-right: 8px; }
+
+            &.active {
+                background-color: var.$background-light;
+                color: #000;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            }
+
+            @media (min-width: var.$breakpoint-mobile) {
+                padding: 6px 24px;
+            }
+        }
+    }
+}
