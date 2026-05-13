@@ -1628,7 +1628,6 @@ function generateGroups() {
   const s = cls.settings;
   const method = s.sortMethod || 'random';
   const pinnedMap = buildPinnedMap(cls);
-  console.log(method);
 
   // Save history snapshot
   if (cls.groups.length > 0) {
@@ -1713,15 +1712,27 @@ function balancedGenderSort(students, numGroups, groups) {
   const girls = shuffle(students.filter(s => s.gender === 'F'));
   const boys = shuffle(students.filter(s => s.gender === 'M'));
   const others = shuffle(students.filter(s => s.gender !== 'F' && s.gender !== 'M'));
-  const result = [];
-  const perGroup = Math.ceil(students.length / numGroups);
-  // Interleave
-  while (girls.length || boys.length || others.length) {
-    if (boys.length) result.push(boys.shift());
-    if (girls.length) result.push(girls.shift());
-    if (others.length) result.push(others.shift());
-  }
-  return result;
+
+  const distribute = (list) => {
+    list.forEach(student => {
+      let bestIndex = 0;
+      let bestSize = groups[0].members.length;
+      for (let i = 1; i < groups.length; i++) {
+        const size = groups[i].members.length;
+        if (size < bestSize) {
+          bestSize = size;
+          bestIndex = i;
+        }
+      }
+      groups[bestIndex].members.push(student.id);
+    });
+  };
+
+  distribute(boys);
+  distribute(girls);
+  distribute(others);
+
+  return null; // groups already assigned directly
 }
 
 function separateGenderSort(students, numGroups, groups) {
