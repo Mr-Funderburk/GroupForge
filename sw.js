@@ -7,7 +7,7 @@ const CACHE_NAME = 'groupforge-v1';
 // All files that make up the app — must match your actual filenames
 const APP_FILES = [
   './',
-  './group-creator.html',
+  './index.html',
   './manifest.json',
   './icon-512.png',
   './icon-192.png',
@@ -81,7 +81,7 @@ self.addEventListener('fetch', event => {
           .catch(() => {
             // Network failed and not in cache — return a minimal offline fallback
             if (event.request.destination === 'document') {
-              return caches.match('./group-creator.html');
+              return caches.match('./index.html');
             }
           });
       })
