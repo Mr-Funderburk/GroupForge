@@ -1318,7 +1318,7 @@
     </div>
     <div class="form-group" style="margin-bottom:4px;">
       <label>Gender</label>
-      <div class="gender-pill">
+      <div class="gender-pill" id="gender-pill">
         <button class="gender-opt" data-gender="M" onclick="selectGender('M', this)">♂ Boy</button>
         <button class="gender-opt" data-gender="F" onclick="selectGender('F', this)">♀ Girl</button>
         <button class="gender-opt active-O" data-gender="O" onclick="selectGender('O', this)">◎ Other</button>
@@ -1336,8 +1336,9 @@
 <div class="modal-overlay" id="modal-bulk-add">
   <div class="modal">
     <div class="modal-title">Bulk Add Students</div>
-    <p class="info-text" style="margin-bottom:12px;">Enter names separated by commas or new lines. Format: <code style="color:var(--accent)">Name, Name M, Name F, FirstName LastName</code></p>
-    <p class="info-text" style="margin-bottom:12px;">Add <strong>M</strong> or <strong>F</strong> after a name to set gender. Default is Other.</p>
+    <p class="info-text" style="margin-bottom:12px;">Each line represents one student. Separate values with commas.</p>
+    <p class="info-text" style="margin-bottom:12px;">Formats: <code style="color:var(--accent)">Name</code> | <code style="color:var(--accent)">FirstName,LastName</code> | <code style="color:var(--accent)">Name,Gender</code> | <code style="color:var(--accent)">FirstName,LastName,Gender</code></p>
+    <p class="info-text" style="margin-bottom:12px;">Gender: <strong>Male/M</strong>, <strong>Female/F</strong>, or <strong>Other/O</strong>. If omitted, uses default gender below.</p>
     <div class="form-group" style="margin-bottom:12px;">
       <label>Default Gender</label>
       <div class="gender-pill" id="bulk-gender-pill">
@@ -1374,6 +1375,35 @@
   </div>
 </div>
 
+<!-- EDIT STUDENT MODAL -->
+<div class="modal-overlay" id="modal-edit-student">
+  <div class="modal">
+    <div class="modal-title">Edit Student</div>
+    <div class="form-row" style="margin-bottom:12px;">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" id="edit-student-first" placeholder="First name" onkeydown="if(event.key==='Enter') editStudent()">
+      </div>
+      <div class="form-group">
+        <label>Last Name (optional)</label>
+        <input type="text" id="edit-student-last" placeholder="Last name" onkeydown="if(event.key==='Enter') editStudent()">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:4px;">
+      <label>Gender</label>
+      <div class="gender-pill" id="edit-gender-pill">
+        <button class="gender-opt" data-gender="M" onclick="selectEditGender('M', this)">♂ Boy</button>
+        <button class="gender-opt" data-gender="F" onclick="selectEditGender('F', this)">♀ Girl</button>
+        <button class="gender-opt active-O" data-gender="O" onclick="selectEditGender('O', this)">◎ Other</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-student')">Cancel</button>
+      <button class="btn btn-primary" onclick="editStudent()">Edit Student</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ===== STATE =====
 let state = {
@@ -1388,6 +1418,7 @@ let undoStack = null;
 let undoBannerTimer = null;
 let dragState = { studentId: null, fromGroup: null };
 let reassignStudentId = null;
+let editStudentId = null;
 let currentSortMethod = 'random';
 
 const CLASS_COLORS = [
@@ -1562,21 +1593,98 @@ function removeStudent(id) {
   toast(`🗑️ ${s.name} removed`);
 }
 
+function openEditStudentModal(id) {
+  const cls = getActiveClass(); if (!cls) return;
+  const s = cls.students.find(st => st.id === id); if (!s) return;
+  editStudentId = id;
+  const parts = s.name.split(' ');
+  const first = parts[0] || '';
+  const last = parts.slice(1).join(' ') || '';
+  document.getElementById('edit-student-first').value = first;
+  document.getElementById('edit-student-last').value = last;
+  selectedGender = s.gender;
+  updateEditGenderUI();
+  openModal('modal-edit-student');
+  setTimeout(() => document.getElementById('edit-student-first').focus(), 100);
+}
+
+function editStudent() {
+  const cls = getActiveClass(); if (!cls) return;
+  const s = cls.students.find(st => st.id === editStudentId); if (!s) return;
+  const first = document.getElementById('edit-student-first').value.trim();
+  const last = document.getElementById('edit-student-last').value.trim();
+  if (!first) { toast('⚠️ Enter a first name', 'warning'); return; }
+  const name = last ? `${first} ${last}` : first;
+  if (name.toLowerCase() !== s.name.toLowerCase() && cls.students.find(st => st.id !== editStudentId && st.name.toLowerCase() === name.toLowerCase())) {
+    toast('⚠️ Student already exists', 'warning'); return;
+  }
+  s.name = name;
+  s.gender = selectedGender;
+  saveState();
+  closeModal('modal-edit-student');
+  renderStudentList();
+  renderStudentStats();
+  renderGroups();
+  toast(`✅ ${name} updated`);
+}
+
+function selectGender(gender, el) {
+  selectedGender = gender;
+  updateGenderUI();
+}
+
+function updateGenderUI() {
+  const pill = document.getElementById('gender-pill');
+  pill.querySelectorAll('.gender-opt').forEach(btn => {
+    btn.classList.toggle('active-' + btn.dataset.gender, btn.dataset.gender === selectedGender);
+  });
+}
+
+function selectEditGender(gender, el) {
+  selectedGender = gender;
+  updateEditGenderUI();
+}
+
+function updateEditGenderUI() {
+  const pill = document.getElementById('edit-gender-pill');
+  pill.querySelectorAll('.gender-opt').forEach(btn => {
+    btn.classList.toggle('active-' + btn.dataset.gender, btn.dataset.gender === selectedGender);
+  });
+}
+
 function bulkAddStudents() {
   const cls = getActiveClass(); if (!cls) return;
   const raw = document.getElementById('bulk-names').value;
-  const lines = raw.split(/[\n,]/).map(l => l.trim()).filter(Boolean);
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
   let added = 0, skipped = 0;
   lines.forEach(line => {
-    const parts = line.trim().split(/\s+/);
-    let gender = bulkDefaultGender;
-    let nameParts = parts;
-    const last = parts[parts.length - 1].toUpperCase();
-    if (last === 'M' || last === 'F' || last === 'O') {
-      gender = last;
-      nameParts = parts.slice(0, -1);
+    const cols = line.split(',').map(c => c.trim()).filter(Boolean);
+    if (!cols.length) return;
+    let name = '', gender = bulkDefaultGender;
+    if (cols.length === 1) {
+      // Just a name
+      name = cols[0];
+    } else if (cols.length === 2) {
+      // Check if second value is a gender
+      const potential_gender = parseGender(cols[1]);
+      if (potential_gender) {
+        // Name, Gender
+        name = cols[0];
+        gender = potential_gender;
+      } else {
+        // FirstName, LastName
+        name = `${cols[0]} ${cols[1]}`;
+      }
+    } else if (cols.length >= 3) {
+      // FirstName, LastName, Gender (or more)
+      const potential_gender = parseGender(cols[cols.length - 1]);
+      if (potential_gender) {
+        name = cols.slice(0, -1).join(' ');
+        gender = potential_gender;
+      } else {
+        name = cols.join(' ');
+      }
     }
-    const name = nameParts.join(' ');
     if (!name) return;
     if (cls.students.find(s => s.name.toLowerCase() === name.toLowerCase())) { skipped++; return; }
     cls.students.push({ id: uid(), name, gender });
@@ -1590,6 +1698,19 @@ function bulkAddStudents() {
   toast(`✅ Added ${added} student${added !== 1 ? 's' : ''}${skipped ? `, ${skipped} skipped` : ''}`);
 }
 
+function parseGender(str) {
+  const s = str.trim().toUpperCase();
+  if (s === 'M' || s === 'MALE') return 'M';
+  if (s === 'F' || s === 'FEMALE') return 'F';
+  if (s === 'O' || s === 'OTHER') return 'O';
+  return null;
+}
+
+function isHeaderRow(cols) {
+  const headerKeywords = ['name', 'first', 'last', 'gender', 'sex', 'male', 'female', 'student', 'firstname', 'lastname'];
+  return cols.some(col => headerKeywords.includes(col.toLowerCase()));
+}
+
 function importCSV(e) {
   const file = e.target.files[0]; if (!file) return;
   const cls = getActiveClass(); if (!cls) return;
@@ -1599,11 +1720,12 @@ function importCSV(e) {
     let added = 0, skipped = 0;
     lines.forEach((line, i) => {
       const cols = line.split(',').map(c => c.trim());
-      if (i === 0 && (cols[0].toLowerCase() === 'name' || cols[0].toLowerCase() === 'first')) return;
+      // Skip header row if detected
+      if (i === 0 && isHeaderRow(cols)) return;
       let name = '', gender = 'O';
       if (cols.length >= 2) {
-        const g = cols[cols.length-1].toUpperCase();
-        if (g === 'M' || g === 'F' || g === 'O') { gender = g; name = cols.slice(0,-1).join(' ').trim(); }
+        const potential_gender = parseGender(cols[cols.length-1]);
+        if (potential_gender) { gender = potential_gender; name = cols.slice(0,-1).join(' ').trim(); }
         else { name = cols.join(' ').trim(); }
       } else { name = cols[0]; }
       if (!name) return;
@@ -1654,7 +1776,6 @@ function generateGroups() {
       if (numGroups === 0) numGroups = 1;
     }
   }
-  console.log(numGroups);
 
   // Keep pinned students in their groups
   const groups = [];
@@ -1923,6 +2044,7 @@ function renderStudentList() {
       ${groupInfo ? `<span class="tag">${escHtml(groupInfo)}</span>` : ''}
       ${s.pinned ? '<span title="Pinned to group">📌</span>' : ''}
       <div class="student-actions">
+        <button class="icon-btn" onclick="openEditStudentModal('${s.id}')" title="Edit">✏️</button>
         <button class="icon-btn" onclick="removeStudent('${s.id}')" title="Remove">🗑️</button>
       </div>
     </div>`;
