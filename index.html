@@ -1203,12 +1203,12 @@
             </div>
             <div class="form-group">
               <label id="group-number-label">Number of Groups</label>
-              <input type="number" id="group-count" value="4" min="1" max="50">
+              <input type="number" id="group-count" value="4" min="1" max="50" onchange="saveSettings()">
             </div>
           </div>
           <div class="form-group" id="overflow-setting" style="display:none; margin-bottom:16px;">
             <label>Overflow Handling</label>
-            <select id="overflow-mode">
+            <select id="overflow-mode" onchange="saveSettings()">
               <option value="spread">Spread extras across existing groups</option>
               <option value="new">Create an extra smaller group</option>
             </select>
@@ -1642,16 +1642,19 @@ function generateGroups() {
 
   let numGroups;
   const total = cls.students.length;
+  const value = parseInt(s.groupCount) || 4;
   if (s.groupMode === 'count') {
-    numGroups = Math.max(1, Math.min(total, parseInt(s.groupCount) || 4));
+    numGroups = Math.max(1, Math.min(total, value));
   } else {
-    const sz = Math.max(1, parseInt(s.groupSize || s.groupCount) || 4);
-    numGroups = Math.ceil(total / sz);
-    // handle small overflow
-    if (total % sz > 0 && total % sz <= Math.floor(sz / 2)) {
-      if (s.overflowMode === 'spread') numGroups = Math.floor(total / sz);
+    const sz = value;
+    if (s.overflowMode === 'new') {
+      numGroups = Math.ceil(total / sz);
+    } else { // 'spread'
+      numGroups = Math.floor(total / sz);
+      if (numGroups === 0) numGroups = 1;
     }
   }
+  console.log(numGroups);
 
   // Keep pinned students in their groups
   const groups = [];
@@ -1817,12 +1820,44 @@ function renderWorkspace() {
   const s = cls.settings;
   document.getElementById('group-mode').value = s.groupMode || 'count';
   document.getElementById('group-count').value = s.groupCount || 4;
+  document.getElementById('overflow-mode').value = s.overflowMode || 'spread';
   currentSortMethod = s.sortMethod || 'random';
   document.querySelectorAll('.sort-option').forEach(el => {
     el.classList.toggle('active', el.dataset.sort === currentSortMethod);
   });
   document.getElementById('rename-class-input').value = '';
   updateGroupModeUI();
+}
+
+function updateGroupModeUI() {
+  const mode = document.getElementById('group-mode').value;
+  const label = document.getElementById('group-number-label');
+  const overflow = document.getElementById('overflow-setting');
+  if (mode === 'count') {
+    label.textContent = 'Number of Groups';
+    overflow.style.display = 'none';
+  } else {
+    label.textContent = 'Students per Group';
+    overflow.style.display = 'block';
+  }
+  saveSettings();
+}
+
+function saveSettings() {
+  const cls = getActiveClass(); if (!cls) return;
+  const s = cls.settings;
+  s.groupMode = document.getElementById('group-mode').value;
+  s.groupCount = parseInt(document.getElementById('group-count').value) || 4;
+  s.overflowMode = document.getElementById('overflow-mode').value;
+  s.sortMethod = currentSortMethod;
+  saveState();
+}
+
+function setSortMethod(method, el) {
+  currentSortMethod = method;
+  document.querySelectorAll('.sort-option').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  saveSettings();
 }
 
 function renderClassList() {
