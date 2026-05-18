@@ -1164,6 +1164,7 @@
           <div class="section-title">Groups</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
             <button class="btn btn-ghost btn-sm" id="undo-btn" onclick="undoLastMove()" disabled>↩ Undo</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadGroupsCSV()" title="Download groups as a spreadsheet">📊 <span>Download CSV</span></button>
             <button class="btn btn-mint btn-sm" onclick="shuffleGroups()">🔀 Shuffle</button>
             <button class="btn btn-primary btn-sm" onclick="generateGroups()">⚡ Generate Groups</button>
           </div>
@@ -2470,6 +2471,99 @@ function loadFromFile(e) {
     e.target.value = '';
   };
   reader.readAsText(file);
+}
+
+// ===== CSV EXPORT =====
+function downloadGroupsCSV() {
+  const cls = getActiveClass();
+  if (!cls) { toast('No class selected.', 'warning'); return; }
+  if (!cls.groups || cls.groups.length === 0) { toast('⚠️ Generate groups first.', 'warning'); return; }
+
+  const date = new Date().toISOString().slice(0, 10);
+  const safeName = cls.name.replace(/[^a-z0-9]/gi, '_');
+
+  // ── Sheet 1: Long format ──────────────────────────────────────────────
+  // One row per student: Group Name, Student Name, First, Last, Gender
+  // Best for filtering, sorting, and pivot tables in Sheets/Excel.
+  const longRows = [
+    ['Group', 'Student Name', 'First Name', 'Last Name', 'Gender']
+  ];
+  cls.groups.forEach(g => {
+    const memberIds = g.members || [];
+    if (memberIds.length === 0) {
+      longRows.push([csvCell(g.name), '(empty)', '', '', '']);
+    } else {
+      // Sort members alphabetically within each group
+      const members = memberIds
+        .map(id => cls.students.find(s => s.id === id))
+        .filter(Boolean)
+        .sort((a, b) => {
+          const na = `${a.lastName || ''} ${a.firstName || a.name || ''}`.trim().toLowerCase();
+          const nb = `${b.lastName || ''} ${b.firstName || b.name || ''}`.trim().toLowerCase();
+          return na.localeCompare(nb);
+        });
+      members.forEach(s => {
+        const fullName = s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim();
+        const first = s.firstName || (s.name ? s.name.split(' ')[0] : '');
+        const last  = s.lastName  || (s.name ? s.name.split(' ').slice(1).join(' ') : '');
+        const gender = s.gender === 'F' ? 'Girl' : s.gender === 'M' ? 'Boy' : 'Other';
+        longRows.push([csvCell(g.name), csvCell(fullName), csvCell(first), csvCell(last), gender]);
+      });
+    }
+  });
+
+  // ── Sheet 2: Wide format ─────────────────────────────────────────────
+  // Groups as columns, students listed down each column.
+  // Great for posting on a board or sharing with students at a glance.
+  const groupNames = cls.groups.map(g => g.name);
+  const groupMembers = cls.groups.map(g =>
+    (g.members || [])
+      .map(id => cls.students.find(s => s.id === id))
+      .filter(Boolean)
+      .sort((a, b) => {
+        const na = `${a.lastName || ''} ${a.firstName || a.name || ''}`.trim().toLowerCase();
+        const nb = `${b.lastName || ''} ${b.firstName || b.name || ''}`.trim().toLowerCase();
+        return na.localeCompare(nb);
+      })
+      .map(s => s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim())
+  );
+  const maxLen = Math.max(...groupMembers.map(g => g.length), 0);
+  const wideRows = [groupNames.map(csvCell)];
+  for (let i = 0; i < maxLen; i++) {
+    wideRows.push(groupMembers.map(members => csvCell(members[i] || '')));
+  }
+
+  // ── Combine both sheets into one CSV with a blank-row separator ───────
+  // Since CSV is single-sheet, we stack them with a label and spacer.
+  const lines = [];
+
+  lines.push(csvCell(`${cls.name} — Groups (${date})`));
+  lines.push('');
+  lines.push('--- DETAIL VIEW (one row per student) ---');
+  longRows.forEach(row => lines.push(row.join(',')));
+
+  lines.push('');
+  lines.push('--- WIDE VIEW (groups as columns) ---');
+  wideRows.forEach(row => lines.push(row.join(',')));
+
+  const csvContent = lines.join('\r\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${safeName}_groups_${date}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  toast('✅ CSV downloaded!');
+}
+
+// Wrap a value in quotes and escape any internal quotes for CSV safety
+function csvCell(val) {
+  const str = (val == null ? '' : String(val)).replace(/"/g, '""');
+  return `"${str}"`;
 }
 
 // ===== PRINT =====
